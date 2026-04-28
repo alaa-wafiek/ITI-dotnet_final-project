@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\ACER\\source\\repos\\GraduationITI\\GraduationITI\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\GraduationITI.bundle.scp.css",
+      "PackagePath": "staticwebassets\\GraduationITI.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\ACER\\source\\repos\\GraduationITI\\GraduationITI\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "C:\\Users\\ACER\\source\\repos\\GraduationITI\\GraduationITI\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\ACER\\source\\repos\\GraduationITI\\GraduationITI\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\ACER\\source\\repos\\GraduationITI\\GraduationITI\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.GraduationITI.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.GraduationITI.props",
+      "PackagePath": "build\\GraduationITI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.GraduationITI.props",
+      "PackagePath": "buildMultiTargeting\\GraduationITI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.GraduationITI.props",
+      "PackagePath": "buildTransitive\\GraduationITI.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

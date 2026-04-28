@@ -1,0 +1,83 @@
+﻿@page "/AddNewCourse"
+
+<div class="container mt-5">
+    @if (ShowForm)
+    {
+        <div class="alert alert-info text-center" role="alert">
+            <h4 class="alert-heading">Add a New Course</h4>
+        </div>
+
+        <EditForm Model="course" OnValidSubmit="OnValidSubmit">
+            <div class="card shadow-sm border-info mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Course Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="courseName" class="form-label">Course Name</label>
+                        <InputText id="courseName" @bind-Value="course.Name" class="form-control" placeholder="Enter course name" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="courseDescription" class="form-label">Course Description</label>
+                        <InputText id="courseDescription" @bind-Value="course.Description" class="form-control" placeholder="Enter course description" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="coursePrerequisite" class="form-label">Course Prerequisite</label>
+                        <InputText id="coursePrerequisite" @bind-Value="course.Prerequisite" class="form-control" placeholder="Enter course prerequisite" />
+                    </div>
+
+                    @*                     <div class="mb-3">
+                <label for="instructor" class="form-label">Select Instructor</label>
+                <InputSelect id="instructor" @bind-Value="course.InstructorID" class="form-control">
+                @foreach (var instructor in instructors)
+                {
+                <option value="@instructor.Id">@instructor.Name</option>
+                }
+                </InputSelect>
+                </div> *@
+
+                    <button type="submit" class="btn btn-info text-white">Add New Course</button>
+                </div>
+            </div>
+        </EditForm>
+    }
+    else
+    {
+        <AddedSuccessfully Name="@courseName" Entity="Course" />
+    }
+</div>
+
+@code {
+    Course course = new Course();
+    List<Instructor> instructors = new List<Instructor>();
+    GraduationDbContext db = new GraduationDbContext();
+    bool ShowForm = true;
+    string courseName;
+
+    protected override Task OnInitializedAsync()
+    {
+        instructors = db.Instructors.ToList();
+        MessagingCenter.Subscribe<AddedSuccessfully>(this, "ShowFormMessage", (sender) =>
+        {
+            ShowForm = true;
+            InvokeAsync(() => StateHasChanged());
+        });
+        return base.OnInitializedAsync();
+    }
+
+    void OnValidSubmit()
+    {
+        db.Courses.Add(course);
+        db.SaveChanges();
+
+        if (course.Id != 0)
+        {
+            courseName = course.Name;
+            MessagingCenter.Send(this, "courseAdded", course);
+            course = new Course();
+            ShowForm = false;
+        }
+    }
+}

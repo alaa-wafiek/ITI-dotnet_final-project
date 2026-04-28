@@ -1,0 +1,90 @@
+﻿@page "/InstructorList"
+
+<div class="container mt-5">
+    <div class="alert alert-primary text-center" role="alert">
+        <h1 class="mb-0">Instructor List</h1>
+    </div>
+
+    <div class="card shadow-sm border-primary mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Instructors</h5>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-danger mb-3" @onclick="DeleteAllInstructorsAsync">Delete All Instructors</button>
+
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Age</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Salary</th>
+                        <th scope="col">Courses</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var instructor in instructors)
+                    {
+                        <tr>
+                            <td>@instructor.Name</td>
+                            <td>@GetAge(instructor.Birthdate)</td>
+                            <td>@instructor.PhoneNumber</td>
+                            <td>@instructor.Email</td>
+                            <td>@instructor.Salary.ToString("C")</td>
+                            <td>@string.Join(", ", instructor.Courses.Select(c => c.Name))</td>
+                            <td>
+                                <button class="btn btn-danger" @onclick="() => DeleteInstructorAsync(instructor.Id)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Instructor> instructors = new List<Instructor>();
+    private GraduationDbContext db;
+
+    protected override async Task OnInitializedAsync()
+    {
+        db = new GraduationDbContext();
+        await LoadInstructorsAsync();
+    }
+
+    private async Task LoadInstructorsAsync()
+    {
+        instructors = await db.Instructors.Include(i => i.Courses).ToListAsync();
+    }
+
+    private async Task DeleteInstructorAsync(int instructorId)
+    {
+        var instructorToDelete = await db.Instructors.FindAsync(instructorId);
+        if (instructorToDelete != null)
+        {
+            db.Instructors.Remove(instructorToDelete);
+            await db.SaveChangesAsync();
+            await LoadInstructorsAsync();
+        }
+    }
+
+    private async Task DeleteAllInstructorsAsync()
+    {
+        var allInstructors = await db.Instructors.ToListAsync();
+
+        if (allInstructors.Count > 0)
+        {
+            db.Instructors.RemoveRange(allInstructors);
+            await db.SaveChangesAsync();
+            await LoadInstructorsAsync();
+        }
+    }
+
+    private int GetAge(DateTime birthdate)
+    {
+        return DateTime.Now.Year - birthdate.Year;
+    }
+}

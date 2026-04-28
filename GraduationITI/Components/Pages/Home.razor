@@ -1,0 +1,51 @@
+﻿@page "/"
+@using System.Globalization
+
+<PageTitle>Home</PageTitle>
+
+<div class="container mt-5">
+    <div class="alert alert-success text-center" role="alert">
+        <h1 class="mb-4">Welcome to My Management System!</h1>
+        <p class="lead">Your one-stop solution for managing courses, instructors, and students efficiently.</p>
+    </div>
+
+    <div class="text-center mt-4">
+        <h2>Hello!</h2>
+        <p class="lead">Today's date is @CurrentDate.ToString("dddd, MMMM d, yyyy", CultureInfo.InvariantCulture).</p>
+    </div>
+
+    <div class="row text-center mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Courses</h5>
+                    <p class="card-text">Easily add, update, and view courses in your system.</p>
+                    <a href="/CourseHome" class="btn btn-primary">Go to Courses</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Instructors</h5>
+                    <p class="card-text">Add new instructors and keep track of their details.</p>
+                    <a href="/InstructorHome" class="btn btn-success">Go to Instructors</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-info">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Students</h5>
+                    <p class="card-text">Update student information and track their progress.</p>
+                    <a href="/StudentHome" class="btn btn-info">Go to Students</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string UserName = "User";
+    private DateTime CurrentDate = DateTime.Now;
+}

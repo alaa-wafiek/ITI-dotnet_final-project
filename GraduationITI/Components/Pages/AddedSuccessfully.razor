@@ -1,0 +1,20 @@
+﻿
+@using AKSoftware.Blazor.Utilities
+<h3>AddedSuccessfully</h3>
+
+
+<div class="alert alert-success" role="alert">
+    <h2>@Name is Added Successfully </h2>
+    <h3>If you need to add a new @Entity, please press:</h3>
+    <button @onclick="OK" type="button" class="btn btn-dark">Add</button>
+</div>
+
+@code {
+    [Parameter] public string Name { get; set; } = string.Empty;
+    [Parameter] public string Entity { get; set; } = "entity";
+
+    void OK()
+    {
+        MessagingCenter.Send(this, "ShowFormMessage");
+    }
+}

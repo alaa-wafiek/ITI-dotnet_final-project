@@ -1,0 +1,64 @@
+﻿@page "/AddInstructor"
+@inject NavigationManager NavigationManager
+
+<div class="container mt-5">
+    <div class="alert alert-primary text-center" role="alert">
+        <h1>Add New Instructor</h1>
+    </div>
+
+    <div class="card shadow-sm border-primary mt-4">
+        <div class="card-body">
+            <EditForm Model="@newInstructor" OnValidSubmit="AddInstructorAsync">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group mb-3">
+                    <label for="Name" class="form-label">Name:</label>
+                    <InputText id="Name" class="form-control" @bind-Value="newInstructor.Name" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="Birthdate" class="form-label">Birthdate:</label>
+                    <InputDate id="Birthdate" class="form-control" @bind-Value="newInstructor.Birthdate" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="PhoneNumber" class="form-label">Phone Number:</label>
+                    <InputText id="PhoneNumber" class="form-control" @bind-Value="newInstructor.PhoneNumber" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="Email" class="form-label">Email:</label>
+                    <InputText id="Email" class="form-control" @bind-Value="newInstructor.Email" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="Salary" class="form-label">Salary:</label>
+                    <InputNumber id="Salary" class="form-control" @bind-Value="newInstructor.Salary" />
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Add Instructor</button>
+                <button type="button" class="btn btn-secondary mt-3" @onclick="Cancel">Cancel</button>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Instructor newInstructor = new Instructor();
+
+    private async Task AddInstructorAsync()
+    {
+        using var db = new GraduationDbContext();
+
+        db.Instructors.Add(newInstructor);
+        await db.SaveChangesAsync();
+
+        NavigationManager.NavigateTo("/InstructorList");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/InstructorList");
+    }
+}

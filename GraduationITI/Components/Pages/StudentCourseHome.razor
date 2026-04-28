@@ -1,0 +1,29 @@
+﻿@page "/StudentCourseHome"
+@inject NavigationManager NavigationManager
+
+<div class="container mt-5">
+    <div class="text-center mt-4">
+        <h2 class="mb-4">Welcome to the Student Course Management System</h2>
+        <p class="lead">Manage student enrollments easily, Add a new enrollment or view the list of enrolled students for various courses.</p>
+    </div>
+
+    <div class="text-center mt-4">
+        <button class="btn btn-success btn-lg" @onclick="NavigateToAddStudentCourse">Add New Enrollment</button>
+    </div>
+
+    <div class="text-center mt-4">
+        <button class="btn btn-primary btn-lg" @onclick="NavigateToStudentCourseList">View Student Course List</button>
+    </div>
+</div>
+
+@code {
+    private void NavigateToAddStudentCourse()
+    {
+        NavigationManager.NavigateTo("/AddStudentCourse");
+    }
+
+    private void NavigateToStudentCourseList()
+    {
+        NavigationManager.NavigateTo("/StudentCourseList");
+    }
+}

@@ -1,0 +1,21 @@
+﻿@page "/CourseHome"
+@inject NavigationManager NavigationManager
+
+<div class="container mt-1">
+
+        <div class="card-body">
+            <AddNewCourse />
+        </div>
+
+    <div class="text-center mt-4">
+        <button class="btn btn-success" @onclick="NavigateToCourseList">View Course List</button>
+    </div>
+</div>
+
+@code {
+    void NavigateToCourseList()
+    {
+        NavigationManager.NavigateTo("/CourseList");
+    }
+
+}

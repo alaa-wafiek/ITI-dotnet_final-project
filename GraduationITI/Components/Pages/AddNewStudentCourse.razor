@@ -1,0 +1,107 @@
+﻿@page "/AddStudentCourse"
+@inject NavigationManager NavigationManager
+<div class="container mt-5">
+    @if (ShowForm)
+    {
+        <div class="alert alert-info text-center" role="alert">
+            <h4 class="alert-heading">Add a New Student Course Enrollment</h4>
+        </div>
+
+        <EditForm Model="studentCourse" OnValidSubmit="OnValidSubmit">
+            <div class="card shadow-sm border-info mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Student Course Enrollment Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="studentId" class="form-label">Student</label>
+                        <InputSelect id="studentId" @bind-Value="studentCourse.StudentId" class="form-control">
+                            <option value="">Select a student</option>
+                            @foreach (var student in students)
+                            {
+                                <option value="@student.Id">@student.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => studentCourse.StudentId)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="courseId" class="form-label">Course</label>
+                        <InputSelect id="courseId" @bind-Value="studentCourse.CourseId" class="form-control">
+                            <option value="">Select a course</option>
+                            @foreach (var course in courses)
+                            {
+                                <option value="@course.Id">@course.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => studentCourse.CourseId)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="grade" class="form-label">Grade</label>
+                        <InputSelect id="grade" @bind-Value="studentCourse.Grade" class="form-control">
+                            <option value="">Select a grade</option>
+                            <option value="A+">A+</option>
+                            <option value="A">A</option>
+                            <option value="B+">B+</option>
+                            <option value="B">B</option>
+                            <option value="C+">C+</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => studentCourse.Grade)" />
+                    </div>
+
+                    <button type="submit" class="btn btn-info text-white">Assign Course</button>
+                </div>
+            </div>
+        </EditForm>
+    }
+    else
+    {
+        <AddedSuccessfully Name="@studentName" Entity="StudentCourse" />
+    }
+
+    <div class="text-center mt-4">
+        <button class="btn btn-primary" @onclick="NavigateToStudentCourseList">View Student Course List</button>
+    </div>
+</div>
+
+@code {
+    private StudentCourse studentCourse = new StudentCourse();
+    private List<Student> students = new List<Student>();
+    private List<Course> courses = new List<Course>();
+    private bool ShowForm = true;
+    private string studentName;
+    private GraduationDbContext db = new GraduationDbContext();
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await db.Students.ToListAsync();
+        courses = await db.Courses.ToListAsync();
+        MessagingCenter.Subscribe<AddedSuccessfully>(this, "ShowFormMessage", (sender) =>
+        {
+            ShowForm = true;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private async Task OnValidSubmit()
+    {
+        db.StudentCourses.Add(studentCourse);
+        await db.SaveChangesAsync();
+
+        if (studentCourse.StudentId != 0 && studentCourse.CourseId != 0)
+        {
+            studentName = students.FirstOrDefault(s => s.Id == studentCourse.StudentId)?.Name ?? "Unknown Student";
+            MessagingCenter.Send(this, "courseAssigned", studentCourse);
+            studentCourse = new StudentCourse();
+            ShowForm = false;
+        }
+    }
+
+    private void NavigateToStudentCourseList()
+    {
+        NavigationManager.NavigateTo("/StudentCourseList");
+    }
+}

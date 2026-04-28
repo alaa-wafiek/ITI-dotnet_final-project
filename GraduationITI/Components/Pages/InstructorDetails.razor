@@ -1,0 +1,202 @@
+﻿@page "/InstructorDetails/{id:int}"
+@inject NavigationManager NavigationManager
+
+<div class="container mt-5">
+    <div class="alert alert-info text-center shadow-sm" role="alert">
+        <h1>Instructor Details</h1>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-info" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        @if (instructor != null)
+        {
+            @if (!isEditMode)
+            {
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title text-primary">@instructor.Name</h3>
+                        <p class="card-text"><strong>Birthdate:</strong> @(instructor.Birthdate.ToShortDateString())</p>
+                        <p class="card-text"><strong>Phone Number:</strong> @instructor.PhoneNumber</p>
+                        <p class="card-text"><strong>Email:</strong> @instructor.Email</p>
+                        <p class="card-text"><strong>Salary:</strong> @(instructor.Salary.ToString("C"))</p>
+                        <button class="btn btn-warning mt-3" @onclick="EnableEditMode">Edit</button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <EditForm Model="instructor" OnValidSubmit="UpdateInstructorAsync">
+                            <div class="form-group mb-3">
+                                <label for="Name" class="form-label">Name:</label>
+                                <input type="text" class="form-control" @bind="instructor.Name" required />
+                                <ValidationMessage For="@(() => instructor.Name)" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="Birthdate" class="form-label">Birthdate:</label>
+                                <InputDate class="form-control" @bind-Value="instructor.Birthdate" />
+                                <ValidationMessage For="@(() => instructor.Birthdate)" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="PhoneNumber" class="form-label">Phone Number:</label>
+                                <input type="text" class="form-control" @bind="instructor.PhoneNumber" required />
+                                <ValidationMessage For="@(() => instructor.PhoneNumber)" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="Email" class="form-label">Email:</label>
+                                <input type="email" class="form-control" @bind="instructor.Email" required />
+                                <ValidationMessage For="@(() => instructor.Email)" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="Salary" class="form-label">Salary:</label>
+                                <input type="number" class="form-control" @bind="instructor.Salary" min="0" />
+                                <ValidationMessage For="@(() => instructor.Salary)" />
+                            </div>
+
+                            <button type="submit" class="btn btn-success mt-3">Save</button>
+                            <button class="btn btn-secondary mt-3" @onclick="CancelEditMode">Cancel</button>
+
+                            @if (updateSuccess)
+                            {
+                                <div class="alert alert-success mt-3">Instructor details updated successfully!</div>
+                            }
+                        </EditForm>
+                    </div>
+                </div>
+            }
+
+            <h3 class="mt-5 text-center text-info">Assigned Courses</h3>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    @if (instructor.Courses.Any())
+                    {
+                        <ul class="list-group">
+                            @foreach (var course in instructor.Courses)
+                            {
+                                <li class="list-group-item">@course.Name</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No courses assigned to this instructor.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Assign New Course</h5>
+                    <div class="form-group">
+                        <label for="Courses">Select Course to Add:</label>
+                        <InputSelect id="Courses" class="form-control" @bind-Value="selectedCourseId">
+                            <option value="">--Select Course--</option>
+                            @foreach (var course in courses.Except(instructor.Courses))
+                            {
+                                <option value="@course.Id">@course.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <button class="btn btn-primary mt-3" @onclick="AddCourseToInstructorAsync">Add Course</button>
+
+                    @if (courseSuccess)
+                    {
+                        <div class="alert alert-success mt-3">Course added successfully!</div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <p class="text-danger text-center">Instructor not found!</p>
+        }
+    }
+
+    <div class="text-center mt-4">
+        <button class="btn btn-secondary" @onclick="GoBack">Back to Instructor List</button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Instructor instructor;
+    private List<Course> courses = new List<Course>();
+    private int? selectedCourseId;
+    private bool isEditMode = false;
+    private bool updateSuccess = false;
+    private bool courseSuccess = false;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var db = new GraduationDbContext();
+        instructor = await db.Instructors.Include(i => i.Courses).FirstOrDefaultAsync(i => i.Id == id);
+        courses = await db.Courses.Include(c => c.Instructors).ToListAsync();
+        isLoading = false;
+    }
+
+    private void EnableEditMode() => isEditMode = true;
+
+    private void CancelEditMode() => isEditMode = false;
+
+    private async Task UpdateInstructorAsync()
+    {
+        using var db = new GraduationDbContext();
+        var instructorInDb = await db.Instructors.FindAsync(id);
+        if (instructorInDb != null)
+        {
+            instructorInDb.Name = instructor.Name;
+            instructorInDb.Birthdate = instructor.Birthdate;
+            instructorInDb.PhoneNumber = instructor.PhoneNumber;
+            instructorInDb.Email = instructor.Email;
+            instructorInDb.Salary = instructor.Salary;
+            await db.SaveChangesAsync();
+            updateSuccess = true;
+        }
+        else
+        {
+            updateSuccess = false;
+        }
+
+        isEditMode = false;
+    }
+
+    private async Task AddCourseToInstructorAsync()
+    {
+        if (selectedCourseId.HasValue)
+        {
+            using var db = new GraduationDbContext();
+            var instructorInDb = await db.Instructors.Include(i => i.Courses).FirstOrDefaultAsync(i => i.Id == id);
+            var courseInDb = await db.Courses.FirstOrDefaultAsync(c => c.Id == selectedCourseId.Value);
+
+            if (instructorInDb != null && courseInDb != null && !instructorInDb.Courses.Contains(courseInDb))
+            {
+                instructorInDb.Courses.Add(courseInDb);
+
+                await db.SaveChangesAsync();
+                instructor = await db.Instructors.Include(i => i.Courses).FirstOrDefaultAsync(i => i.Id == id);
+                courses = await db.Courses.Include(c => c.Instructors).ToListAsync();
+                courseSuccess = true;
+            }
+            else
+            {
+                courseSuccess = false;
+            }
+        }
+    }
+
+    private void GoBack() => NavigationManager.NavigateTo("/InstructorHome");
+}

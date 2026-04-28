@@ -1,0 +1,90 @@
+﻿@page "/InstructorHome"
+@inject NavigationManager NavigationManager
+
+<div class="container mt-5">
+    <div class="alert alert-primary text-center" role="alert">
+        <h1>Instructor Home</h1>
+    </div>
+
+    <div class="mb-3">
+        <button class="btn btn-primary" @onclick="GoToAddInstructor">Add New Instructor</button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Salary</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (instructors != null && instructors.Any())
+                {
+                    @foreach (var instructor in instructors)
+                    {
+                        <tr>
+                            <td>@instructor.Name</td>
+                            <td>@GetAge(instructor.Birthdate)</td>
+                            <td>@instructor.PhoneNumber</td>
+                            <td>@instructor.Email</td>
+                            <td>@instructor.Salary.ToString("C")</td>
+                            <td>
+                                <a class="btn btn-info" href="/InstructorDetails/@instructor.Id">View Details</a>
+                                <button class="btn btn-danger" @onclick="() => DeleteInstructorAsync(instructor.Id)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">No instructors available.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<Instructor> instructors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInstructorsAsync();
+    }
+
+    private async Task LoadInstructorsAsync()
+    {
+        using var db = new GraduationDbContext();
+        instructors = await db.Instructors.ToListAsync();
+    }
+
+    private void GoToAddInstructor()
+    {
+        NavigationManager.NavigateTo("/AddInstructor");
+    }
+
+    private async Task DeleteInstructorAsync(int instructorId)
+    {
+        using var db = new GraduationDbContext();
+        var instructor = await db.Instructors.FindAsync(instructorId);
+        if (instructor != null)
+        {
+            db.Instructors.Remove(instructor);
+            await db.SaveChangesAsync();
+
+            instructors = instructors.Where(i => i.Id != instructorId).ToList();
+        }
+    }
+
+    private int GetAge(DateTime birthdate)
+    {
+        return DateTime.Now.Year - birthdate.Year;
+    }
+}

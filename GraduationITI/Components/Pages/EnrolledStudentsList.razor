@@ -1,0 +1,46 @@
+﻿@* <h3>EnrolledStudentsList</h3>
+
+@page "/EnrolledStudentsList"
+@using Microsoft.EntityFrameworkCore
+
+<h3>Enrolled Students</h3>
+
+@if (enrolledStudents.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Course Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var enrollment in enrolledStudents)
+            {
+                <tr>
+                    <td>@enrollment.Student.Name</td>
+                    <td>@enrollment.Course.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        No students enrolled in this course.
+    </div>
+}
+
+@code {
+    GraduationDbContext db = new();
+    List<StudentCourse> enrolledStudents = new();
+
+    protected override void OnInitialized()
+    {
+        enrolledStudents = db.StudentCourses.Include(sc => sc.Student)
+                                            .Include(sc => sc.Course)
+                                            .ToList();
+    }
+}
+ *@
